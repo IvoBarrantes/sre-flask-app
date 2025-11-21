@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: monitoring
+data:
+  sre-alerts.yml: |
+    groups:
+      - name: sre-flask-app-rules
+        rules:
+          # 1) App down
+          - alert: SreFlaskAppDown
+            expr: up{job="sre-flask-app"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "SRE Flask app is down"
+              description: "No targets for job 'sre-flask-app' are up for more than 1 minute."
+
+          # 2) High error rate (5xx) per endpoint
+          - alert: SreFlaskHighErrorRate
+            expr: sum(rate(http_errors_total[5m])) by (endpoint) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High error rate on {{ $labels.endpoint }}"
+              description: "The 5xx error rate on {{ $labels.endpoint }} is > 0.1 errors/sec over the last 5 minutes."
+
+          # 3) High latency (P95 > 0.5s)
+          - alert: SreFlaskHighLatency
+            expr: |
+              histogram_quantile(
+                0.95,
+                sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+              ) > 0.5
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High latency (P95) on SRE Flask app"
+              description: "The 95th percentile latency is higher than 0.5s over the last 5 minutes."
+

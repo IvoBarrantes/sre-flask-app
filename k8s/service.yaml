@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sre-flask-app
+  namespace: sre-app
+  labels:
+    app: sre-flask-app
+spec:
+  type: ClusterIP
+  selector:
+    app: sre-flask-app
+  ports:
+    - name: http
+      port: 5001       # Port inside the cluster
+      targetPort: 5001 # Port on the container
+
