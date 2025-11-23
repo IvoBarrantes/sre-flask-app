@@ -1,43 +1,46 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment # Kubernetes will manage the lifecicle of Grafana pods 
 metadata:
-  name: grafana
-  namespace: monitoring
-  labels:
-    app: grafana
+  name: grafana 
+  namespace: monitoring # All the grafana resources will go inside the monitoring namespace
+  labels: # How to identify the resources created by this deployment. 
+    app: grafana 
 spec:
-  replicas: 1
-  selector:
+  replicas: 1 # Number of grafana pod replicas
+  selector: # How to identify the pods that belong to this deployment
     matchLabels:
       app: grafana
-  template:
+  template: # Template for the pods created by this deployment
     metadata:
       labels:
         app: grafana
     spec:
       containers:
-        - name: grafana
-          image: grafana/grafana:11.1.0
+        - name: grafana # Name of the container 
+          image: grafana/grafana:11.1.0   # Docker image to be used for this container
           ports:
-            - containerPort: 3000
-          env:
-            - name: GF_SECURITY_ADMIN_USER
+            - containerPort: 3000   # Port to be exposed by the container
+          env: # This variables set the default Grafana login credentials. 
+            - name: GF_SECURITY_ADMIN_USER 
               value: admin
             - name: GF_SECURITY_ADMIN_PASSWORD
               value: admin
----
-apiVersion: v1
-kind: Service
-metadata:
+--- # Service to expose Grafana deployment inside the cluster
+apiVersion: v1 
+kind: Service # Service to expose Grafana deployment 
+metadata: 
   name: grafana
-  namespace: monitoring
+  namespace: monitoring # The service will be created inside the monitoring namespace
   labels:
     app: grafana
-spec:
+spec: 
   selector:
-    app: grafana
-  type: ClusterIP
+    app: grafana # The service will send traffic to pods labeled app: grafana
+  type: ClusterIP # Type of service - ClusterIP exposes the service on a cluster-internal IP. 
   ports:
     - name: http
       port: 3000
       targetPort: 3000
+
+# To access Grafana: kubectl port-forward svc/grafana -n monitoring 3000:3000
+

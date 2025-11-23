@@ -1,34 +1,35 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: sre-flask-app
-  namespace: sre-app
-  labels:
+apiVersion: apps/v1 #Which Version od Kubernetes is being used
+kind: Deployment #Tells Kubernetes this object is a Deployment 
+metadata: 
+  name: sre-flask-app #Name of the Deployment. 
+  namespace: sre-app #Namespace where the Deployment will be created
+  labels: #Key/value identifies used for grouping or selecting resources. 
     app: sre-flask-app
-spec:
-  replicas: 1
-  selector:
+spec: #Spec Section 
+  replicas: 1 # The number of desired pod replicas.
+  selector: # Kubernetes uses this to identify the pods that belong to this deployment.
     matchLabels:
       app: sre-flask-app
-  template:
+  template: # Template for the pods that will be created by this deployment - every pod created by this deployment will have this configuration. 
     metadata:
       labels:
         app: sre-flask-app
-    spec:
-      containers:
-        - name: sre-flask-app
-          image: sre-flask-app:latest
+    spec: # Pod Specification (Containers) - Defines the containers that will run in the pod. 
+      containers: #Defines the containers that will run in the pod. 
+        - name: sre-flask-app #Name of the container
+          image: sre-flask-app:latest #Docker image to be used for this container.
           ports:
-            - containerPort: 5001
-          readinessProbe:
+            - containerPort: 5001 #Container port to be exposed.
+          readinessProbe: #Readiness probe configuration to determine if the container is ready to accept traffic. - Health must return success 200 OK 
             httpGet:
               path: /health
               port: 5001
-            initialDelaySeconds: 3
-            periodSeconds: 5
-          livenessProbe:
-            httpGet:
+            initialDelaySeconds: 3 # Starts checking after 3 seconds 
+            periodSeconds: 5 # Checks every 5 seconds 
+          livenessProbe: #Liveness probe configuration to determine if the container is still running. 
+            httpGet: 
               path: /health
               port: 5001
-            initialDelaySeconds: 5
-            periodSeconds: 5
+            initialDelaySeconds: 5 # Starts checking after 5 seconds
+            periodSeconds: 5 # Checks every 5 seconds
+            #If it fails, Kubernetes restarts the container. 

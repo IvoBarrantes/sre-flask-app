@@ -1,8 +1,8 @@
 apiVersion: v1
-kind: ConfigMap
+kind: ConfigMap # ConfigMap to hold Prometheus alerting rules 
 metadata:
-  name: prometheus-rules
-  namespace: monitoring
+  name: prometheus-rules # Name of the ConfigMap
+  namespace: monitoring # The ConfigMap will be created inside the monitoring namespace
 data:
   sre-alerts.yml: |
     groups:

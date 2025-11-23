@@ -1,15 +1,15 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment # Kubernetes will manage the lifecycle of Prometheus pods
 metadata:
   name: prometheus
-  namespace: monitoring
+  namespace: monitoring # All the Prometheus resources will go inside the monitoring namespace
   labels:
-    app: prometheus
-spec:
-  replicas: 1
+    app: prometheus #Used later by the service and selector to identify Prometheus pods
+spec: # How many pods, which pods 
+  replicas: 1 # Number of Prometheus pod replicas 
   selector:
-    matchLabels:
-      app: prometheus
+    matchLabels: #This deplyoyment will manage pods with the label app: prometheus 
+      app: prometheus  # Label to identify Prometheus pods 
   template:
     metadata:
       labels:
@@ -17,38 +17,38 @@ spec:
     spec:
       containers:
         - name: prometheus
-          image: prom/prometheus:v2.55.0
+          image: prom/prometheus:v2.55.0 # Official Prometheus Docker image 
           args:
-            - "--config.file=/etc/prometheus/prometheus.yml"
-            - "--storage.tsdb.path=/prometheus"
-            - "--web.enable-lifecycle"
+            - "--config.file=/etc/prometheus/prometheus.yml" # Tellss prometheus where to find its configuration file 
+            - "--storage.tsdb.path=/prometheus" # Directory where Prometheus stores times serios data (TSDB - Time Series DB)
+            - "--web.enable-lifecycle" # Allos you to call HTTP endpoints to reload configuration without restarting Prometheus
           ports:
-            - containerPort: 9090
-          volumeMounts:
-            - name: config
+            - containerPort: 9090 # Prometheus exposes it's web UI and API on port 9090
+          volumeMounts: # Mount the ConfigMap and Rules volumes into the container
+            - name: config # Config Volume
               mountPath: /etc/prometheus
-            - name: rules
+            - name: rules # Rules Volume
               mountPath: /etc/prometheus/rules
-      volumes:
-        - name: config
+      volumes: # Where the data comes from for the volumeMounts 
+        - name: config # Config Volume 
           configMap:
             name: prometheus-config
-        - name: rules
+        - name: rules # Rules Volume 
           configMap:
             name: prometheus-rules
 ---
-apiVersion: v1
-kind: Service
+apiVersion: v1 
+kind: Service # Service to expose Prometheus deployment inside the cluster 
 metadata:
   name: prometheus
   namespace: monitoring
   labels:
     app: prometheus
-spec:
+spec: # Service Specification 
   selector:
     app: prometheus
-  type: ClusterIP
+  type: ClusterIP # ClusterIP exposes the service on a cluster-internal IP. 
   ports:
     - name: http
-      port: 9090
-      targetPort: 9090
+      port: 9090 # Service port
+      targetPort: 9090 # Container port where Prometheus is listening

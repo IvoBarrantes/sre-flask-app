@@ -1,22 +1,22 @@
-apiVersion: v1
-kind: ConfigMap
+apiVersion: v1 #ConfigMap Definition to configure Prometheus 
+kind: ConfigMap #Defines a ConfigMap resource in Kubernetes
 metadata:
-  name: prometheus-config
-  namespace: monitoring
+  name: prometheus-config # Name of the ConfigMap
+  namespace: monitoring # The ConfigMap will be created inside the monitoring namespace
 data:
-  prometheus.yml: |
-    global:
+  prometheus.yml: | # Everything after this is the real Prometheus configuration file   
+    global: 
       scrape_interval: 15s
 
-    rule_files:
+    rule_files: 
       - /etc/prometheus/rules/*.yml
 
-    alerting:
+    alerting: 
       alertmanagers:
         - static_configs:
             - targets: ['alertmanager.monitoring.svc.cluster.local:9093']
 
-    scrape_configs:
+    scrape_configs: 
       # Scrape Prometheus itself
       - job_name: 'prometheus'
         static_configs:

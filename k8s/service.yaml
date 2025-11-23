@@ -1,14 +1,14 @@
 apiVersion: v1
-kind: Service
+kind: Service # Service to expose the SRE Flask App inside the cluster
 metadata:
-  name: sre-flask-app
-  namespace: sre-app
+  name: sre-flask-app # Name of the Service 
+  namespace: sre-app # The Service will be created inside the sre-app namespace
   labels:
     app: sre-flask-app
-spec:
-  type: ClusterIP
+spec: # Service Specification
+  type: ClusterIP # Type of service - ClusterIP exposes the service on a cluster-internal IP.
   selector:
-    app: sre-flask-app
+    app: sre-flask-app # The service will send traffic to pods labeled app: sre-flask-app
   ports:
     - name: http
       port: 5001       # Port inside the cluster
